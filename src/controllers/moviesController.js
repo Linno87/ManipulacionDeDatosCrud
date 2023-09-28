@@ -104,15 +104,36 @@ const moviesController = {
         .catch(error => console.log(error))
     },
     destroy: function (req, res) {
-        db.Movie.destroy({ where: {
-            id: req.params.id
-        }})
-        .then(
-            db.Movie.findAll()
-            .then(movies => {
-                return res.render('moviesList.ejs', {movies});
-            })
-        )
+       
+
+        db.ActorMovie.destroy({
+            where: {
+                movie_id: req.params.id 
+            }
+        })
+            .then((response)=>{
+            console.log(response)
+            
+                db.Actor.update({
+                    favorite_movie_id: null
+                },{
+                    where: {
+                        favorite_movie_id : req.params.id
+                    }
+                }).then((response)=>{
+                    console.log(response)
+                    db.Movie.destroy({ where: {
+                        id: req.params.id
+                    }})
+                    .then(()=>{
+                        return res.redirect('/movies');
+                    })
+                })
+
+           
+        })
+
+        
         .catch(error => console.log(error))
     }
 
